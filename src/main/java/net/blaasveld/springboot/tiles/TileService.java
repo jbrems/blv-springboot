@@ -1,5 +1,7 @@
 package net.blaasveld.springboot.tiles;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,8 +15,10 @@ import java.net.http.HttpResponse;
 @Service
 public class TileService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TileService.class);
+
     public InputStream getTile(int z, int x, int y) {
-        System.out.println(String.format("Getting tile %d %d %d", z, x, y));
+        LOGGER.debug(String.format("Getting tile %d %d %d", z, x, y));
         return this.fetchTile(z, x, y);
     }
 
@@ -23,7 +27,7 @@ public class TileService {
             HttpClient client = HttpClient.newHttpClient();
             URI uri = new URI(String.format("https://tile.openstreetmap.org/%d/%d/%d.png", z, x, y));
 
-            System.out.println(String.format("Fetching tile from %s", uri.toString()));
+            LOGGER.debug(String.format("Fetching tile from %s", uri.toString()));
 
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
@@ -35,13 +39,9 @@ public class TileService {
 
             HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
             return response.body();
-        } catch (URISyntaxException use) {
-            System.out.println(use.getMessage());
-        } catch (InterruptedException ie) {
-            System.out.println(ie.getMessage());
-        } catch (IOException ioe) {
-            System.out.println(ioe.getMessage());
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return null;
         }
-        return null;
     }
 }

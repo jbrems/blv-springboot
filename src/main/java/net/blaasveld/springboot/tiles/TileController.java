@@ -1,5 +1,7 @@
 package net.blaasveld.springboot.tiles;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -16,15 +18,20 @@ import java.io.InputStream;
 @RequestMapping("/tiles")
 public class TileController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TileController.class);
+
     private TileService tileService;
 
     @Autowired
     public TileController(TileService tileService) {
+        LOGGER.debug("Creating TileController instance");
         this.tileService = tileService;
     }
 
     @GetMapping(value = "/{z}/{x}/{y}", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<InputStreamResource> getTile(@PathVariable String z, @PathVariable String x, @PathVariable String y) {
+        LOGGER.info(String.format("Handling GET request for /tiles/%s/%s/%s", z, x, y));
+
         InputStream tileStream = tileService.getTile(Integer.parseInt(z), Integer.parseInt(x), Integer.parseInt(y));
 
         InputStreamResource tileResource = new InputStreamResource(tileStream);
