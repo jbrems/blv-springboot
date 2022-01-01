@@ -1,13 +1,13 @@
 package net.blaasveld.springboot.tiles;
 
+import org.apache.commons.io.input.CloseShieldInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -17,9 +17,24 @@ public class TileService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TileService.class);
 
+    private TileCacheService tileCacheService;
+
+    @Autowired
+    public TileService(TileCacheService tileCacheService) {
+        LOGGER.debug("Creating TileService instance");
+        this.tileCacheService = tileCacheService;
+    }
+
     public InputStream getTile(int z, int x, int y) {
         LOGGER.debug(String.format("Getting tile %d %d %d", z, x, y));
-        return this.fetchTile(z, x, y);
+
+        if (!this.tileCacheService.hasTile(z, x, y)) {
+            LOGGER.debug("Cache miss");
+            InputStream tile = this.fetchTile(z, x, y);
+            this.tileCacheService.cacheTile(z, x, y, new CloseShieldInputStream(tile));
+        }
+
+        return this.tileCacheService.getTile(z, x, y);
     }
 
     private InputStream fetchTile(int z, int x, int y) {
