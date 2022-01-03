@@ -32,7 +32,7 @@ public class TileController {
     public ResponseEntity<InputStreamResource> getTile(@PathVariable String z, @PathVariable String x, @PathVariable String y) {
         LOGGER.info(String.format("Handling GET request for /tiles/%s/%s/%s", z, x, y));
 
-        InputStream tileStream = tileService.getTile(Integer.parseInt(z), Integer.parseInt(x), Integer.parseInt(y));
+        InputStream tileStream = tileService.getTile(z, x, y);
 
         InputStreamResource tileResource = new InputStreamResource(tileStream);
 

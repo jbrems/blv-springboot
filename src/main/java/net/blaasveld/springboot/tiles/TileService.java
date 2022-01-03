@@ -25,8 +25,8 @@ public class TileService {
         this.tileCacheService = tileCacheService;
     }
 
-    public InputStream getTile(int z, int x, int y) {
-        LOGGER.debug(String.format("Getting tile %d %d %d", z, x, y));
+    public InputStream getTile(String z, String x, String y) {
+        LOGGER.debug(String.format("Getting tile %s %s %s", z, x, y));
 
         if (!this.tileCacheService.hasTile(z, x, y)) {
             LOGGER.debug("Cache miss");
@@ -37,10 +37,10 @@ public class TileService {
         return this.tileCacheService.getTile(z, x, y);
     }
 
-    private InputStream fetchTile(int z, int x, int y) {
+    private InputStream fetchTile(String z, String x, String y) {
         try {
             HttpClient client = HttpClient.newHttpClient();
-            URI uri = new URI(String.format("https://tile.openstreetmap.org/%d/%d/%d.png", z, x, y));
+            URI uri = new URI(String.format("https://tile.openstreetmap.org/%s/%s/%s.png", z, x, y));
 
             LOGGER.debug(String.format("Fetching tile from %s", uri.toString()));
 
